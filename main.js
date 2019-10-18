@@ -1,3 +1,7 @@
+// ((1+2)+(3*44+1))+12
+// (3 + 133) + 12
+// = 148
+
 const app = new Vue({
   el: "#app",
   data: {
@@ -6,7 +10,48 @@ const app = new Vue({
   },
   methods: {
     calculate() {
-      this.result = new Function('return ' + this.theInput)();
+      this.result = this.doBrackets(this.theInput);
+    },
+    doBrackets(parens) {
+      const re = /\([0-9\+\-\*\/]+\)/;
+      const reNum = /^\d+$/;
+      let expression = '';
+      while (re.test(parens)) {
+        expression = parens.match(re)[0]
+        expression = expression.slice(1, expression.length - 1);
+        parens = parens.replace(re, this.doArithmetic(expression));
+      }
+      return reNum.test(parens) ? parens : this.doArithmetic(parens);
+    },
+    doArithmetic(expression) {
+      // TOFIX: multiply first, add later
+
+      const reMD = /[0-9]+[\*\/][0-9]+/;
+      const reAS = /[0-9]+[\+\-][0-9]+/;
+      let elements;
+      while (reMD.test(expression)) {
+        elements = expression.split(/([\*\/])/g);
+        if(elements[1] == '*') {
+          expression =
+            +this.doBrackets(elements[0]) * +this.doBrackets(elements[2]);
+        } else if(elements[1] == '/') {
+          expression =
+            +this.doBrackets(elements[0]) / +this.doBrackets(elements[2]);
+        }
+      }
+
+      while (reAS.test(expression)) {
+        elements = expression.split(/([\+\-])/g);
+        if(elements[1] == '+') {
+          expression =
+            +this.doBrackets(elements[0]) + +this.doBrackets(elements[2]);
+        } else if(elements[1] == '-') {
+          expression =
+            +this.doBrackets(elements[0]) - +this.doBrackets(elements[2]);
+        }
+      }
+
+      return expression;
     }
   },
   template: `
