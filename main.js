@@ -1,11 +1,7 @@
-// ((1+2)+(3*44+1))+12
-// (3 + 133) + 12
-// = 148
-
 const app = new Vue({
   el: "#app",
   data: {
-    theInput: '',
+    theInput: '((1+2)+(3*44+1))+12',
     result: '',
   },
   methods: {
@@ -24,21 +20,9 @@ const app = new Vue({
       return reNum.test(parens) ? parens : this.doArithmetic(parens);
     },
     doArithmetic(expression) {
-      // TOFIX: multiply first, add later
-
       const reMD = /[0-9]+[\*\/][0-9]+/;
       const reAS = /[0-9]+[\+\-][0-9]+/;
       let elements;
-      while (reMD.test(expression)) {
-        elements = expression.split(/([\*\/])/g);
-        if(elements[1] == '*') {
-          expression =
-            +this.doBrackets(elements[0]) * +this.doBrackets(elements[2]);
-        } else if(elements[1] == '/') {
-          expression =
-            +this.doBrackets(elements[0]) / +this.doBrackets(elements[2]);
-        }
-      }
 
       while (reAS.test(expression)) {
         elements = expression.split(/([\+\-])/g);
@@ -48,6 +32,17 @@ const app = new Vue({
         } else if(elements[1] == '-') {
           expression =
             +this.doBrackets(elements[0]) - +this.doBrackets(elements[2]);
+        }
+      }
+
+      while (reMD.test(expression)) {
+        elements = expression.split(/([\*\/])/g);
+        if(elements[1] == '*') {
+          expression =
+            +this.doBrackets(elements[0]) * +this.doBrackets(elements[2]);
+        } else if(elements[1] == '/') {
+          expression =
+            +this.doBrackets(elements[0]) / +this.doBrackets(elements[2]);
         }
       }
 
